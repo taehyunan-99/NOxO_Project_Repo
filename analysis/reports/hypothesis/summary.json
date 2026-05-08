@@ -1,0 +1,87 @@
+{
+  "H1": {
+    "title": "O2 준누수 검증",
+    "result": {
+      "verdict": "LEAKAGE_HIGH",
+      "r2_o2_only": 0.9947912077134887,
+      "r2_with_o2": 0.9952322533292568,
+      "r2_without_o2": 0.3934947377560639,
+      "delta_r2": 0.6017375155731929
+    },
+    "elapsed_sec": 0.7,
+    "recommendation": "O2 포함/제외 두 모델 모두 유지. 예측 모델은 O2 사용, 해석 모델은 O2 제외."
+  },
+  "H2": {
+    "title": "출력 구간별 NOx 메커니즘",
+    "result": {
+      "verdict": "GLOBAL_BETTER",
+      "global_r2": 0.9724308834025355,
+      "avg_segment_r2": 0.9465382470001691,
+      "improvement_pct": -2.662671131110939,
+      "segment_results": {
+        "<140": {
+          "r2": NaN,
+          "mae": NaN
+        },
+        "140-160": {
+          "r2": 0.9392258475565113,
+          "mae": 0.036737125657907016
+        },
+        "160-180": {
+          "r2": 0.9615009580182241,
+          "mae": 0.01780158434453143
+        },
+        "180-200": {
+          "r2": 0.9388879354257718,
+          "mae": 0.021234724502189592
+        },
+        "≥200": {
+          "r2": NaN,
+          "mae": NaN
+        }
+      }
+    },
+    "elapsed_sec": 4.1,
+    "recommendation": "통합 모델 유지."
+  },
+  "H3": {
+    "title": "N2 주입 역인과 검증",
+    "result": {
+      "verdict": "SINGLE_FEATURE_INSUFFICIENT",
+      "r2_current": -0.5167766595544929,
+      "r2_lag_best": -0.5149353420539076,
+      "r2_lead_best": -0.5215187296542683
+    },
+    "elapsed_sec": 0.6,
+    "recommendation": "NQJ 단독 예측 불가. SHAP 기반 다변수 기여도 분석 필요."
+  },
+  "H4": {
+    "title": "배기가스 온도 지연 검증",
+    "result": {
+      "verdict": "SINGLE_FEATURE_INSUFFICIENT",
+      "r2_current": -0.48816429954918106,
+      "r2_lag_best": -0.48214340918551923,
+      "r2_diff_best": -0.5470339236134574,
+      "best_lag_min": 0,
+      "best_lag_feat": "IGCC.CC.G1.TTXM_lag_1min"
+    },
+    "elapsed_sec": 0.71,
+    "recommendation": "NQJ 단독 예측 불가. SHAP 기반 다변수 기여도 분석 필요."
+  },
+  "H5": {
+    "title": "NPR 비선형성 검증",
+    "result": {
+      "verdicts": [
+        "NONLINEAR",
+        "INTERACTION_EFFECTIVE"
+      ],
+      "r2_linear": -0.7058975917511945,
+      "r2_poly": -0.6974278018108595,
+      "nonlinear_gain_pct": 1.1998610052377545,
+      "r2_interaction_best": -0.5142104632946438,
+      "best_interaction": "NPR_x_NQJ"
+    },
+    "elapsed_sec": 0.71,
+    "recommendation": "NPR hinge 또는 다항 피처 추가 권장. / NPR × NQJ / NPR × DWATT 상호작용 피처 추가 권장."
+  }
+}
