@@ -29,18 +29,20 @@ class OperatingPoint:
     신규 7개 변수의 단위/한계는 [추후 결정] — 임의 가안값.
     """
 
-    syngas_flow: float = 1500.0    # 합성가스 유량 [가안]
-    igv_opening: float = 75.0      # IGV 개도 [%]
-    n2_offset: float = 200.0       # 희석질소 오프셋 [가안]
-    n2_valve_1: float = 50.0       # N2 주입 제어밸브 #1 개도 [%, 가안]
-    syngas_srv: float = 60.0       # Syngas SRV 개도 [%, 가안]
-    syngas_gcv_1: float = 55.0     # Syngas GCV #1 개도 [%, 가안]
-    syngas_gcv_1a: float = 55.0    # Syngas GCV #1A 개도 [%, 가안]
-    syngas_gcv_2: float = 55.0     # Syngas GCV #2 개도 [%, 가안]
-    ibh_valve: float = 30.0        # IBH 입구 가열 제어밸브 개도 [%, 가안]
-    n2_flow: float = 100.0         # N2 주입 유량 [가안]
-    exhaust_temp: float = 580.0    # 배기온도 기준점 [°C] IGCC.CC.G1.TTXM 평균 가안
-    air_flow: float = 4500.0       # IGV 75%일 때 추정 공기유량 [kg/h, 가안]
+    # 학습 데이터(NOx_test_20250825.csv, DWATT>50MW 정상 운전 구간) 실측 mean으로 보정.
+    # 옛 가안값은 단위/스케일이 안 맞아 compute_lambda 등 파생 피처가 폭주(λ≈32)했음.
+    syngas_flow: float = 43.0      # IGCC.CC.G1.ca_fqsg_cl 실측 mean 43.14
+    igv_opening: float = 63.0      # IGCC.CC.G1.csgv 실측 mean 63.14
+    n2_offset: float = -10.0       # IGCC.CC.G1.NQKR3_MONITOR 실측 mean -9.98 (부호 주의)
+    n2_valve_1: float = 28.0       # IGCC.CC.G1.nicvs1 실측 mean 27.56
+    syngas_srv: float = 39.0       # IGCC.CC.G1.FSAGR 실측 mean 38.72
+    syngas_gcv_1: float = 73.0     # IGCC.CC.G1.FSAG11 실측 mean 72.79
+    syngas_gcv_1a: float = 44.0    # IGCC.CC.G1.FSAG11A 실측 mean 43.85
+    syngas_gcv_2: float = 15.0     # IGCC.CC.G1.FSAG12 실측 mean 14.96
+    ibh_valve: float = 0.4         # IGCC.CC.G1.CSBHX 실측 mean 0.37 (정상 운전 시 거의 닫힘)
+    n2_flow: float = 29.0          # IGCC.CC.G1.NQJ 실측 mean 29.25
+    exhaust_temp: float = 627.0    # IGCC.CC.G1.TTXM 실측 mean 627.54
+    air_flow: float = 4500.0       # IGV 63%일 때 추정 공기유량 [kg/h, 가안]
 
 
 # ============================================================
@@ -153,7 +155,7 @@ class FeatureConfig:
     """공기비·CO·효율 계산식 상수."""
 
     # compute_lambda
-    base_lambda: float = 1.10          # 기준 운전점에서의 λ [무차원]
+    base_lambda: float = 2.50          # 기준 운전점에서의 λ [무차원] — GE 7F/7FA 초희박 연소 정상 대역
     n2_correction: float = 0.0005      # N2 1단위 증가당 λ 보정 계수
     n2_scale: float = 1000.0           # N2 몰분율 환산 스케일 (delta_n2 계산용)
 
