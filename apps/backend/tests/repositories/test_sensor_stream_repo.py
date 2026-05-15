@@ -51,6 +51,7 @@ def _stream_row(
         "exhaust_temp": 580.0,
         "power_mw": 165.0,
         "npr_primary": 1.5,
+        "o2_pct": 14.2,
     }
 
 
@@ -76,9 +77,11 @@ async def test_fetch_since_translates_db_columns_to_domain_keys(mock_session_fac
     assert "nox_ppm" not in row
     assert "power_mw" not in row
     assert "npr_primary" not in row
-    # 11개 동일명은 그대로
+    # 12개 동일명은 그대로
     assert row["syngas_flow"] == 100.0
     assert row["exhaust_temp"] == 580.0
+    # o2_pct는 nox_15pct 표시 보정 입력 — 동일명 도메인 키로 통과
+    assert row["o2_pct"] == 14.2
 
 
 @pytest.mark.asyncio

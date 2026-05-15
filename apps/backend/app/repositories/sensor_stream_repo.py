@@ -29,9 +29,12 @@ from sqlalchemy.orm import Session, sessionmaker
 logger = logging.getLogger(__name__)
 
 # (DB 컬럼명, SensorBuffer 도메인 키) — DDL 순서 보존.
-# 11개는 동일명이지만 nox_ppm/power_mw/npr_primary 3개는 변환 필요.
+# 12개는 동일명이지만 nox_ppm/power_mw/npr_primary 3개는 변환 필요.
 # tags.py::ALL_TAGS_TO_DOMAIN과 정합(`nox_ppm`→`nox`, `power_mw`→`power`,
-# `npr_primary`→`vnpr_p` 외란 도메인 키).
+# `npr_primary`→`vnpr_p` 외란 도메인 키, `o2_pct`→`o2_pct` 표시 보정 입력).
+# o2_pct는 OutputVars/학습 타깃이 아니라 realtime_engine의 nox_15pct 표시
+# 보정식 입력. 누락 시 correct_nox_15pct가 raw nox로 폴백해 대시보드에
+# 보정 전 값이 노출된다. DDL/ETL 컬럼 추가와 동시 반영 전제(팀원 작업).
 _STREAM_COLUMN_MAP: tuple[tuple[str, str], ...] = (
     ("syngas_flow", "syngas_flow"),
     ("igv_opening", "igv_opening"),
@@ -47,6 +50,7 @@ _STREAM_COLUMN_MAP: tuple[tuple[str, str], ...] = (
     ("exhaust_temp", "exhaust_temp"),
     ("power_mw", "power"),
     ("npr_primary", "vnpr_p"),
+    ("o2_pct", "o2_pct"),
 )
 
 # composite cursor — (ingested_at, id) 단조성 보장.
