@@ -59,3 +59,21 @@ def test_o2_pct_is_optional_when_transforming_message():
     )
 
     assert row["o2_pct"] is None
+
+
+def test_disturbance_columns_are_optional_when_transforming_message():
+    import streaming.etl_consumer as etl_consumer
+
+    missing_raw_tag = "IGCC.CC.G1.LHVSYNDW_SCF"
+    values = {
+        raw_tag: 1.0
+        for raw_tag in etl_consumer.RAW_TO_DB_MAPPING
+        if raw_tag != missing_raw_tag
+    }
+    row = etl_consumer.transform_message_to_row(
+        {"measured_at": "2025-08-25 00:15:00", "values": values},
+        stream_topic="noxo.sensor.raw",
+        ingest_mode="stream",
+    )
+
+    assert row["lhvsyndw_scf"] is None

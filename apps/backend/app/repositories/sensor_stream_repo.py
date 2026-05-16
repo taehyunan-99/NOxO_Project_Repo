@@ -3,7 +3,8 @@
 KafkaSensorStream과 별개 경로 — kafka-etl-consumer가 적재한 row를
 backend가 (ingested_at, id) composite cursor 기반으로 단조 증가 순서로 pull.
 
-DDL은 `database/sensor_data_stream.sql` — 14 운영 컬럼 + o2_pct + 5 lineage + ingested_at.
+DDL은 `database/sensor_data_stream.sql` — 14 운영 컬럼 + o2_pct +
+ML 외란 컬럼 + 5 lineage + ingested_at.
 schema SoT 변경은 협의 필요(`AGENTS.md` root 가드).
 
 도메인 키 매핑 — `app/domain/tags.py::ALL_TAGS_TO_DOMAIN`이 SoT.
@@ -29,7 +30,7 @@ from sqlalchemy.orm import Session, sessionmaker
 logger = logging.getLogger(__name__)
 
 # (DB 컬럼명, SensorBuffer 도메인 키) — DDL 순서 보존.
-# 11개는 동일명이지만 nox_ppm/power_mw/npr_primary 3개는 변환 필요.
+# 대부분 동일명이지만 nox_ppm/power_mw/npr_primary 3개는 변환 필요.
 # tags.py::ALL_TAGS_TO_DOMAIN과 정합(`nox_ppm`→`nox`, `power_mw`→`power`,
 # `npr_primary`→`vnpr_p` 외란 도메인 키). o2_pct는 NOx 15% O2 보정 표시용.
 _STREAM_COLUMN_MAP: tuple[tuple[str, str], ...] = (
@@ -48,6 +49,34 @@ _STREAM_COLUMN_MAP: tuple[tuple[str, str], ...] = (
     ("power_mw", "power"),
     ("npr_primary", "vnpr_p"),
     ("o2_pct", "o2_pct"),
+    ("fpsg", "fpsg"),
+    ("ftsg", "ftsg"),
+    ("lhvsyndw_scf", "lhvsyndw_scf"),
+    ("fpsg2", "fpsg2"),
+    ("fpsg3", "fpsg3"),
+    ("afdpm", "afdpm"),
+    ("ctim", "ctim"),
+    ("afpap", "afpap"),
+    ("cpd", "cpd"),
+    ("ctd", "ctd"),
+    ("tnh_v", "tnh_v"),
+    ("atid", "atid"),
+    ("exhmass", "exhmass"),
+    ("fpgn1_sel", "fpgn1_sel"),
+    ("fpgn2_sel", "fpgn2_sel"),
+    ("routput_32", "routput_32"),
+    ("vnpr_s", "vnpr_s"),
+    ("npnj", "npnj"),
+    ("ntnj", "ntnj"),
+    ("nqjo2", "nqjo2"),
+    ("ndt1", "ndt1"),
+    ("npnj2", "npnj2"),
+    ("routput_6", "routput_6"),
+    ("pic7069a_pv", "pic7069a_pv"),
+    ("zt7069b_pv", "zt7069b_pv"),
+    ("tt_h1_90123", "tt_h1_90123"),
+    ("itdp", "itdp"),
+    ("tcsph1", "tcsph1"),
 )
 
 # composite cursor — (ingested_at, id) 단조성 보장.

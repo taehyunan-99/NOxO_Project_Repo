@@ -47,10 +47,75 @@ RAW_TO_DB_MAPPING = {
     "IGCC.CC.G1.DWATT": "power_mw",
     "IGCC.CC.G1.VNPR_P": "npr_primary",
     "IGCC.DeNOX.AIT_H1_902": "o2_pct",
+    "IGCC.CC.G1.FPSG": "fpsg",
+    "IGCC.CC.G1.FTSG": "ftsg",
+    "IGCC.CC.G1.LHVSYNDW_SCF": "lhvsyndw_scf",
+    "IGCC.CC.G1.FPSG2": "fpsg2",
+    "IGCC.CC.G1.FPSG3": "fpsg3",
+    "IGCC.CC.G1.AFDPM": "afdpm",
+    "IGCC.CC.G1.CTIM": "ctim",
+    "IGCC.CC.G1.afpap": "afpap",
+    "IGCC.CC.G1.CPD": "cpd",
+    "IGCC.CC.G1.CTD": "ctd",
+    "IGCC.CC.G1.tnh_v": "tnh_v",
+    "IGCC.CC.G1.ATID": "atid",
+    "IGCC.CC.G1.EXHMASS": "exhmass",
+    "IGCC.CC.G1.FPGN1_SEL": "fpgn1_sel",
+    "IGCC.CC.G1.FPGN2_SEL": "fpgn2_sel",
+    "IGCC.CC.G1.ROUTPUT_32": "routput_32",
+    "IGCC.CC.G1.VNPR_S": "vnpr_s",
+    "IGCC.CC.G1.NPNJ": "npnj",
+    "IGCC.CC.G1.NTNJ": "ntnj",
+    "IGCC.CC.G1.NQJO2": "nqjo2",
+    "IGCC.CC.G1.ndt1": "ndt1",
+    "IGCC.CC.G1.NPNJ2": "npnj2",
+    "IGCC.CC.G1.ROUTPUT_6": "routput_6",
+    "IGCC.IG.PIC7069A.PV": "pic7069a_pv",
+    "IGCC.IG.ZT7069B.PV": "zt7069b_pv",
+    "IGCC.DeNOX.TT_H1_90123": "tt_h1_90123",
+    "IGCC.CC.G1.itdp": "itdp",
+    "IGCC.CC.G1.tcsph1": "tcsph1",
 }
 
 DB_COLUMNS = list(RAW_TO_DB_MAPPING.values())
-OPTIONAL_DB_COLUMNS = {"o2_pct"}
+DISTURBANCE_DB_COLUMNS = (
+    "fpsg",
+    "ftsg",
+    "lhvsyndw_scf",
+    "fpsg2",
+    "fpsg3",
+    "afdpm",
+    "ctim",
+    "afpap",
+    "cpd",
+    "ctd",
+    "tnh_v",
+    "atid",
+    "exhmass",
+    "fpgn1_sel",
+    "fpgn2_sel",
+    "routput_32",
+    "vnpr_s",
+    "npnj",
+    "ntnj",
+    "nqjo2",
+    "ndt1",
+    "npnj2",
+    "routput_6",
+    "pic7069a_pv",
+    "zt7069b_pv",
+    "tt_h1_90123",
+    "itdp",
+    "tcsph1",
+)
+OPTIONAL_DB_COLUMNS = {"o2_pct", *DISTURBANCE_DB_COLUMNS}
+LINEAGE_COLUMNS = [
+    "source_file",
+    "stream_topic",
+    "kafka_partition",
+    "kafka_offset",
+    "ingest_mode",
+]
 
 
 def _build_database_url_from_components() -> str | None:
@@ -159,75 +224,23 @@ def is_bootstrap_reset_message(message: dict) -> bool:
 
 
 def upsert_stream_row(engine, row: dict) -> None:
+    insert_columns = ["measured_at", *DB_COLUMNS, *LINEAGE_COLUMNS]
+    column_sql = ",\n            ".join(insert_columns)
+    value_sql = ",\n            ".join(f":{column}" for column in insert_columns)
+    update_columns = [*DB_COLUMNS, *LINEAGE_COLUMNS]
+    update_sql = ",\n            ".join(
+        f"{column} = EXCLUDED.{column}" for column in update_columns
+    )
     sql = text(
         f"""
         INSERT INTO {TABLE_NAME} (
-            measured_at,
-            syngas_flow,
-            igv_opening,
-            n2_offset,
-            n2_valve_1,
-            syngas_srv,
-            syngas_gcv_1,
-            syngas_gcv_1a,
-            syngas_gcv_2,
-            ibh_valve,
-            n2_flow,
-            nox_ppm,
-            exhaust_temp,
-            power_mw,
-            npr_primary,
-            source_file,
-            stream_topic,
-            kafka_partition,
-            kafka_offset,
-            ingest_mode,
-            o2_pct
+            {column_sql}
         ) VALUES (
-            :measured_at,
-            :syngas_flow,
-            :igv_opening,
-            :n2_offset,
-            :n2_valve_1,
-            :syngas_srv,
-            :syngas_gcv_1,
-            :syngas_gcv_1a,
-            :syngas_gcv_2,
-            :ibh_valve,
-            :n2_flow,
-            :nox_ppm,
-            :exhaust_temp,
-            :power_mw,
-            :npr_primary,
-            :source_file,
-            :stream_topic,
-            :kafka_partition,
-            :kafka_offset,
-            :ingest_mode,
-            :o2_pct
+            {value_sql}
         )
         ON CONFLICT (measured_at) DO UPDATE
         SET
-            syngas_flow = EXCLUDED.syngas_flow,
-            igv_opening = EXCLUDED.igv_opening,
-            n2_offset = EXCLUDED.n2_offset,
-            n2_valve_1 = EXCLUDED.n2_valve_1,
-            syngas_srv = EXCLUDED.syngas_srv,
-            syngas_gcv_1 = EXCLUDED.syngas_gcv_1,
-            syngas_gcv_1a = EXCLUDED.syngas_gcv_1a,
-            syngas_gcv_2 = EXCLUDED.syngas_gcv_2,
-            ibh_valve = EXCLUDED.ibh_valve,
-            n2_flow = EXCLUDED.n2_flow,
-            nox_ppm = EXCLUDED.nox_ppm,
-            exhaust_temp = EXCLUDED.exhaust_temp,
-            power_mw = EXCLUDED.power_mw,
-            npr_primary = EXCLUDED.npr_primary,
-            source_file = EXCLUDED.source_file,
-            stream_topic = EXCLUDED.stream_topic,
-            kafka_partition = EXCLUDED.kafka_partition,
-            kafka_offset = EXCLUDED.kafka_offset,
-            ingest_mode = EXCLUDED.ingest_mode,
-            o2_pct = EXCLUDED.o2_pct,
+            {update_sql},
             ingested_at = CURRENT_TIMESTAMP
         """
     )

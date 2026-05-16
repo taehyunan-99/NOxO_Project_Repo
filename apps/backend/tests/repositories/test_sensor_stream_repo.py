@@ -53,6 +53,34 @@ def _stream_row(
         "power_mw": 165.0,
         "npr_primary": 1.5,
         "o2_pct": o2_pct,
+        "fpsg": 35.0,
+        "ftsg": 183.0,
+        "lhvsyndw_scf": 9180.0,
+        "fpsg2": 27.0,
+        "fpsg3": 15.0,
+        "afdpm": 62.0,
+        "ctim": 29.0,
+        "afpap": 757.0,
+        "cpd": 12.0,
+        "ctd": 387.0,
+        "tnh_v": 3599.0,
+        "atid": 29.0,
+        "exhmass": 415.0,
+        "fpgn1_sel": 2.0,
+        "fpgn2_sel": 2.0,
+        "routput_32": 67.0,
+        "vnpr_s": 1.2,
+        "npnj": 27.0,
+        "ntnj": 116.0,
+        "nqjo2": 4.0,
+        "ndt1": 115.0,
+        "npnj2": 15.0,
+        "routput_6": 90.0,
+        "pic7069a_pv": 2.3,
+        "zt7069b_pv": 21.0,
+        "tt_h1_90123": 356.0,
+        "itdp": 26.0,
+        "tcsph1": 132.0,
     }
 
 
@@ -74,6 +102,8 @@ async def test_fetch_since_translates_db_columns_to_domain_keys(mock_session_fac
     assert row["nox"] == 33.0
     assert row["power"] == 165.0
     assert row["vnpr_p"] == 1.5
+    assert row["lhvsyndw_scf"] == 9180.0
+    assert row["vnpr_s"] == 1.2
     assert row["o2_pct"] == 10.0
     # DB 컬럼명은 더 이상 노출되지 않음
     assert "nox_ppm" not in row
