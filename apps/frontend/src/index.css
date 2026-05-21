@@ -1472,6 +1472,19 @@ a {
   width: min(1280px, 100%);
 }
 
+.db-summary {
+  display: grid;
+  gap: 6px;
+  max-width: 900px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.db-summary p {
+  margin: 0;
+}
+
 .hero-grid,
 .split-hero {
   display: grid;

@@ -47,9 +47,9 @@ const erdTables: readonly ErdTable[] = [
     columns: [
       ['id', 'bigserial', 'PK', '스트림 적재 행 ID'],
       ['measured_at', 'timestamp', 'NOT NULL, UNIQUE', '원천 센서 측정 시간'],
-      ['operating_columns_14', 'double precision', 'NOT NULL', 'sensor_data와 동일한 핵심 운전 컬럼 14개'],
+      ['운영 컬럼 14개 그룹', 'double precision', 'NOT NULL', 'sensor_data와 동일한 핵심 운전 컬럼 묶음'],
       ['o2_pct', 'double precision', 'nullable', 'NOx 15% O2 보정용 선택 컬럼'],
-      ['ml_feature_columns_28', 'double precision', 'nullable', '예측 보조용 disturbance/raw 피처 컬럼 그룹'],
+      ['ML 보조 피처 28개 그룹', 'double precision', 'nullable', '예측 보조용 disturbance/raw 피처 컬럼 묶음'],
       ['source_file', 'varchar(255)', 'NOT NULL', '입력 원천 파일명'],
       ['stream_topic', 'varchar(128)', 'NOT NULL', 'Kafka-compatible topic 이름'],
       ['kafka_partition', 'integer', 'UNIQUE 조합', 'Kafka partition'],
@@ -109,10 +109,14 @@ export function DatabasePage() {
       <div className="content-inner db-inner">
         <div className="section-label">DATABASE</div>
         <h1 className="section-title">데이터 모델 구조</h1>
-        <p className="body-copy">
-          IGCC train 데이터는 batch 테이블에, test-day replay 데이터는 streaming 전용 테이블에
-          분리 저장한다. 시뮬레이션 세션·제어 입력·예측 결과는 sid 기준 로그 테이블로 연결한다.
-        </p>
+        <div className="db-summary">
+          <p>
+            IGCC train 데이터는 batch 테이블에, test-day replay 데이터는 streaming 전용 테이블에 분리 저장한다.
+          </p>
+          <p>
+            시뮬레이션 세션·제어 입력·예측 결과는 sid 기준 로그 테이블로 연결한다.
+          </p>
+        </div>
 
         <section
           className="panel"
